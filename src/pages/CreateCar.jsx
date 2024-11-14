@@ -11,8 +11,8 @@ const CreateCar = () => {
   });
   const [tags,setTags] = useState([]);
   const [imageFiles, setImageFiles] = useState([]); 
-  const [imageUrls, setImageUrls] = useState([]); 
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);    
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +53,7 @@ const CreateCar = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const urls = await uploadImagesToCloudinary();
@@ -62,6 +63,8 @@ const CreateCar = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error("Error uploading images", error);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -113,7 +116,20 @@ const CreateCar = () => {
             error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>
         }
 
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg">Add Car</button>
+        <button
+         type="submit" 
+         className="w-full bg-blue-500 text-white py-2 rounded-lg"
+         disabled={loading}>
+            {
+                loading ? (
+                    <div className="absolute inset-0 flex justify-center items-center">
+                        <div className="border-t-2 border-b-2 border-white w-6 h-6 rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                    'Add Car'
+                )
+            }
+        </button>
       </form>
     </div>
   );

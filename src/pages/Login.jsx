@@ -2,20 +2,26 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 
-const Login = () => {
+const Login = ({ setIsAuthenticated, fetchCars }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); 
     try {
       const response = await login({ email, password });
       localStorage.setItem('token', response.token);
+      setIsAuthenticated(true);
+      await fetchCars();
       navigate('/dashboard');
     } catch (err) {
       setError('Invalid credentials');
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -49,7 +55,19 @@ const Login = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg">Login</button>
+          <button 
+            type="submit" 
+            className="w-full bg-blue-500 text-white py-2 rounded-lg relative"
+            disabled={loading} 
+          >
+            {loading ? (
+              <div className="absolute inset-0 flex justify-center items-center">
+                <div className="border-t-2 border-b-2 border-white w-6 h-6 rounded-full animate-spin"></div> 
+              </div>
+            ) : (
+              'Login'
+            )}
+          </button>
         </form>
         <p className="text-center mt-4">
           Don't have an account? <a href="/signup" className="text-blue-500">Sign up</a>
