@@ -9,8 +9,10 @@ const CreateCar = () => {
     description: '',
     tags: ''
   });
-  const [imageFiles, setImageFiles] = useState([]); // Store selected image files
-  const [imageUrls, setImageUrls] = useState([]); // Store uploaded image URLs
+  const [tags,setTags] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]); 
+  const [imageUrls, setImageUrls] = useState([]); 
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,7 +20,13 @@ const CreateCar = () => {
   };
 
   const handleImageChange = (e) => {
-    setImageFiles(Array.from(e.target.files)); // Store selected files in state
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length + imageFiles.length > 10) {
+      setError('You can upload a maximum of 10 images.');
+    } else {
+      setImageFiles([...imageFiles, ...selectedFiles]);
+      setError('');
+    }
   };
 
   const uploadImagesToCloudinary = async () => {
@@ -57,6 +65,12 @@ const CreateCar = () => {
     }
   };
 
+    const handleTagsChange = (e) => {
+    const tags = e.target.value.split(',');
+    setTags(tags);
+    setCarData({ ...carData, tags: tags });
+    };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex justify-center items-center">
       <form onSubmit={handleSubmit} className="max-w-lg w-full bg-white rounded-lg shadow-md p-6">
@@ -82,7 +96,7 @@ const CreateCar = () => {
           type="text"
           name="tags"
           value={carData.tags}
-          onChange={handleChange}
+          onChange={handleTagsChange}
           placeholder="Tags (comma-separated)"
           className="w-full mb-4 p-2 border rounded-lg"
           required
@@ -95,6 +109,9 @@ const CreateCar = () => {
           accept="image/*"
           className="w-full mb-4"
         />
+        {
+            error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+        }
 
         <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg">Add Car</button>
       </form>
